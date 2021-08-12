@@ -1,30 +1,25 @@
-//upload this on the Arduino which gets cc
+// upload this on the Arduino which gets cc
 
-//for OddEvenSplitAlgorithm and HighLowSplitAlgorithm
+// for normal algorithms
 
-//this Arduino only uses SoftwareSerial communication
+// this Arduino only uses SoftwareSerial communication
 
-//enable software serial communication with other Arduino
+// enable software serial communication with other Arduino
 #include <SoftwareSerial.h>
-SoftwareSerial button(12, 13); //SoftwareSerial pin
+SoftwareSerial button(12, 13); // SoftwareSerial pin
 
 //save buttons' states
-int state2 = 1, state3 = 1, state4 = 1, state5 = 1, state6 = 1, state7 = 1, state8 = 1, state9 = 1, state10 = 1, state11 = 1;
+int state[10];
 
 void setup()
 {
-    //set pins as buttons
-    pinMode(2, INPUT);
-    pinMode(3, INPUT);
-    pinMode(4, INPUT);
-    pinMode(5, INPUT);
-    pinMode(6, INPUT);
-    pinMode(7, INPUT);
-    pinMode(8, INPUT);
-    pinMode(9, INPUT);
-    pinMode(10, INPUT);
-    pinMode(11, INPUT);
-    //begin SoftwareSerial communication, BPS:9600
+    // set pins as buttons
+    // init buttons' states
+    for (int i = 0; i < 10; i++) {
+        pinMode(i + 2, INPUT);
+        state[i] = 1;
+    }
+    // begin SoftwareSerial communication, BPS:9600
     button.begin(9600);
 }
 
@@ -35,125 +30,71 @@ void loop()
     //data to send to the other Arduino and PC
     char data;
 
-    a = digitalRead(2);
-    if (a == 1 && state2 == 1) {
-        state2 = 0;
-        int counts = 0;
-        while(a==1)
-        {
-            //check the button pressed time
-            a=digitalRead(2);
-            counts = counts + 1;
-            delay(100);
+    for (int i = 0; i < 9; i++) {
+        if (i == 0 || i == 2) {
+            int a = digitalRead(i + 2);
+            if (a && state[i]) {
+                state[i] = 0;
+                int counts = 0;
+                while (a) {
+                    // check the button pressed time
+                    a = digitalRead(i + 2);
+                    counts = counts + 1;
+                    delay(100);
+                }
+                state[i] = 1;
+                // send the data to the other Arduino
+                char data;
+                if (i == 0) {
+                    if (counts < 5)
+                        data = 'a';
+                    else
+                        data = 'b';
+                } else {
+                    if (counts < 5)
+                        data = 'c';
+                    else
+                        data = 'd';
+                }
+                button.write(data);
+            }
+        } else {
+            int a = digitalRead(i + 2); // save button status
+            if (a && state[i]) {
+                state[i] = 0;
+                char data; // data to send to the other Arduino and PC
+                switch (i) {
+                case 1:
+                    data = 'B';
+                    break;
+                case 3:
+                    data = 'D';
+                    break;
+                case 4:
+                    data = 'E';
+                    break;
+                case 5:
+                    data = 'F';
+                    break;
+                case 6:
+                    data = 'G';
+                    break;
+                case 7:
+                    data = 'H';
+                    break;
+                case 8:
+                    data = 'I';
+                    break;
+                case 9:
+                    data = 'J';
+                    break;
+                default:
+                    break;
+                }
+                button.write(data);
+            }
+            if (!a)
+                state[i] = 1;
         }
-        state2 = 1;
-        //send the data to the other Arduino
-        if (counts < 5)
-            data = 'a';
-        else
-            data = 'b';
-        button.write(data); 
     }
-    if (a == 0)
-        state2 = 1;
-
-    a = digitalRead(3);
-    if (a == 1 && state3 == 1) {
-        data = 'B';
-        state3 = 0;
-        //send the data to the other Arduino
-        button.write(data);
-    }
-    if (a == 0)
-        state3 = 1;
-
-    a = digitalRead(4);
-    if (a == 1 && state4 == 1) {
-        state4 = 0;
-        int counts = 0;
-        while(a==1)
-        {
-            //check the button pressed time
-            a=digitalRead(4);
-            counts = counts + 1;
-            delay(100);
-        }
-        state4 = 1;
-        //send the data to the other Arduino
-        if (counts < 5)
-            data = 'c';
-        else
-            data = 'd';
-        button.write(data);
-    }
-
-    a = digitalRead(5);
-    if (a == 1 && state5 == 1) {
-        data = 'D';
-        state5 = 0;
-        //send the data to the other Arduino
-        button.write(data);
-    }
-    if (a == 0)
-        state5 = 1;
-
-    a = digitalRead(6);
-    if (a == 1 && state6 == 1) {
-        data = 'E';
-        state6 = 0;
-        //send the data to the other Arduino
-        button.write(data);
-    }
-    if (a == 0)
-        state6 = 1;
-
-    a = digitalRead(7);
-    if (a == 1 && state7 == 1) {
-        data = 'F';
-        state7 = 0;
-        //send the data to the other Arduino
-        button.write(data); 
-    }
-    if (a == 0)
-        state7 = 1;
-
-    a = digitalRead(8);
-    if (a == 1 && state8 == 1) {
-        data = 'G';
-        state8 = 0;
-        //send the data to the other Arduino
-        button.write(data); 
-    }
-    if (a == 0)
-        state8 = 1;
-
-    a = digitalRead(9);
-    if (a == 1 && state9 == 1) {
-        data = 'H';
-        state9 = 0;
-        //send the data to the other Arduino
-        button.write(data);
-    }
-    if (a == 0)
-        state9 = 1;
-
-    a = digitalRead(10);
-    if (a == 1 && state10 == 1) {
-        data = 'I';
-        state10 = 0;
-        //send the data to the other Arduino
-        button.write(data); 
-    }
-    if (a == 0)
-        state10 = 1;
-
-    a = digitalRead(11);
-    if (a == 1 && state11 == 1) {
-        data = 'J';
-        state11 = 0;
-        //send the data to the other Arduino
-        button.write(data);
-    }
-    if (a == 0)
-        state11 = 1;
 }
